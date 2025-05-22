@@ -55,14 +55,14 @@ public:
 
   // Meshes and Effects
 
-  al::VAOMesh ribbon{al::Mesh::TRIANGLES};
+  al::VAOMesh ribbon{al::Mesh::LINE_STRIP_ADJACENCY};
   al::VAOMesh reflectedRibbon{al::Mesh::TRIANGLES};
+  al::Mesh test;
   al::VAOMesh referenceMesh;
+  al::Vec3f color1{0.1, 0.3, 0.4};
+  al::Vec3f color2{0.9, 0.9, 0.9};
   Attractor mainAttractor;
   float updatedSpeed = 1.0;
-
-  VertexEffectChain ribbonEffectChain;
-  RippleEffect rippleZ;
 
   al::Light light;
   // Light light;
@@ -78,8 +78,7 @@ public:
   void onCreate() override {
     nav().pos(al::Vec3d(head.pos())); //
 
-    rippleZ.setParams(0.01, 0.1, 2.0, 'z');
-    ribbonEffectChain.pushBack(&rippleZ);
+    al::addSphere(test);
 
     // Initialize Mesh
     // mainAttractor.makeNoiseCube(referenceMesh, 5.0, 5);
@@ -123,7 +122,7 @@ public:
     sceneTime += dt;
 
     // Apply Attractor Effect
-    mainAttractor.processArneodo(referenceMesh, dt, 1.0);
+    mainAttractor.processRossler(referenceMesh, dt, 1.0);
     target = referenceMesh.vertices()[0];
     reflectedTarget = target * al::Vec3f(-1.0, 1.0, 1.0);
     // mainAttractor.processChen(ribbon, dt, 1.0);
@@ -140,16 +139,16 @@ public:
     ribbon.vertex(head.pos() + head.ur() * width);
     ribbon.vertex(head.pos());
     ribbon.vertex(head.pos() - head.ur() * width);
-    ribbon.color(1.0, 1.0, 1.0, 0.4);
-    ribbon.color(1.0, 1.0, 1.0, 0.05);
-    ribbon.color(1.0, 1.0, 1.0, 0.4);
+    ribbon.color(color1.x, color1.y, color1.z, 0.7);
+    ribbon.color(color1.x, color1.y, color1.z, 0.3);
+    ribbon.color(color1.x, color1.y, color1.z, 0.7);
 
     reflectedRibbon.vertex(reflectedHead.pos() + reflectedHead.ur() * width);
     reflectedRibbon.vertex(reflectedHead.pos());
     reflectedRibbon.vertex(reflectedHead.pos() - reflectedHead.ur() * width);
-    reflectedRibbon.color(1.0, 1.0, 1.0, 0.4);
-    reflectedRibbon.color(1.0, 1.0, 1.0, 0.05);
-    reflectedRibbon.color(1.0, 1.0, 1.0, 0.4);
+    reflectedRibbon.color(color1.x, color1.y, color1.z, 0.5);
+    reflectedRibbon.color(color1.x, color1.y, color1.z, 0.05);
+    reflectedRibbon.color(color1.x, color1.y, color1.z, 0.4);
 
     //     if ((int)(globalTime * 10) % 50 == 0) {
     //     addBranch(ribbon, head, width);
@@ -166,7 +165,7 @@ public:
       ribbon.normal(head.uu());
       ribbon.normal(head.uu());
     }
-    // MAKE ALL OF THESE INTO LOOPS
+
     const int n = ribbon.vertices().size();
     if (n > 3) {
       ribbon.index(n - 1);
@@ -202,9 +201,6 @@ public:
       ribbon.scale(1.001);
       reflectedRibbon.scale(1.001);
     }
-
-    // ribbonEffectChain.process(ribbon, sceneTime);
-    // ribbonEffectChain.process(reflectedRibbon, sceneTime);
     // ribbon.scale(1.0001);
     ribbon.update();
 
@@ -218,20 +214,23 @@ public:
 
   void onDraw(al::Graphics &g) override {
     glEnable(GL_BLEND);
-    g.blendTrans();
+    // g.blendTrans();
     g.depthTesting(true);
-    g.clear(0.0, 0.0, 0.5, 1.0);
+    // g.clear(1.0, 1.0, 0.9, 1.0);
+    g.clear(sin(sceneTime));
+
     // g.depthTesting(true);
     g.blending(true);
-    g.blendAdd(); // Additive blending for glowing effect
+    // g.blendAdd(); // Additive blending for glowing effect
     g.lighting(true);
     // lighting from karl's example
     light.globalAmbient(al::RGB(0.5, (1.0), 1.0));
     light.ambient(al::RGB(0.5, (1.0), 1.0));
     light.diffuse(al::RGB(1, 1, 0.5));
     g.light(light);
-    material.specular(light.diffuse());
+    material.specular(light.diffuse() * 0.1);
     material.shininess(50);
+
     g.material(material);
 
     // Use Custom Glow Shader
@@ -240,7 +239,7 @@ public:
     // glowShader.uniform("u_resolution", al::Vec2f(width(), height()));
     g.pointSize(2.5);
     g.meshColor();
-    // g.color (1.0, 1.0, 1.0, 0.5);
+    // g.color(0.0);
     g.pointSize(10.0);
     g.draw(referenceMesh);
     g.draw(ribbon);
