@@ -30,13 +30,13 @@
 // #include "softlight-sphere/meshMorph.hpp"
 #include "softlight-sphere/eoys-mesh-fx/scatter.hpp"
 #include "softlight-sphere/eoys-mesh-fx/vfxMain.hpp"
-#include "softlight-sphere/loadAudioScene.hpp"
-#include "softlight-sphere/parseObj.hpp"
-#include "softlight-sphere/soundObject.hpp"
+#include "softlight-sphere/utility/loadAudioScene.hpp"
+#include "softlight-sphere/utility/parseObj.hpp"
+#include "softlight-sphere/utility/soundObject.hpp"
 // #include "softlight-sphere/imageToMesh.hpp"
 // #include "softlight-sphere/imageToSphere.hpp"
-#include "softlight-sphere/attractors.hpp"
-#include "softlight-sphere/imageColorToMesh.hpp"
+#include "softlight-sphere/utility/attractors.hpp"
+#include "softlight-sphere/utility/imageColorToMesh.hpp"
 
 /* TO DO:
 

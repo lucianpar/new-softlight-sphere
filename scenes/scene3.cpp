@@ -20,10 +20,19 @@
 #include <string>
 
 // MY CUSTOM INCLUDES:
-#include "softlight-sphere/attractors.hpp"
 #include "softlight-sphere/eoys-mesh-fx/ripple.hpp"
 #include "softlight-sphere/eoys-mesh-fx/scatter.hpp"
 #include "softlight-sphere/eoys-mesh-fx/vfxUtility.hpp"
+// #include "softlight-sphere/meshMorph.hpp"
+#include "softlight-sphere/eoys-mesh-fx/scatter.hpp"
+#include "softlight-sphere/eoys-mesh-fx/vfxMain.hpp"
+#include "softlight-sphere/utility/loadAudioScene.hpp"
+#include "softlight-sphere/utility/parseObj.hpp"
+#include "softlight-sphere/utility/soundObject.hpp"
+// #include "softlight-sphere/imageToMesh.hpp"
+// #include "softlight-sphere/imageToSphere.hpp"
+#include "softlight-sphere/utility/attractors.hpp"
+#include "softlight-sphere/utility/imageColorToMesh.hpp"
 
 /*
 * sequence
