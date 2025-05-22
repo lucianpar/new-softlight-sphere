@@ -25,32 +25,14 @@
 #include "softlight-sphere/eoys-mesh-fx/scatter.hpp"
 #include "softlight-sphere/eoys-mesh-fx/vfxUtility.hpp"
 
-// Shader Program
-// al::ShaderProgram glowShader;
+/*
+* sequence
+* work on removing oldest mesh vertices
+*update world color to flow into next scene
+* add more mirrors
+*figure out spacings
 
-// void addBranch(al::VAOMesh &mesh, const al::Nav &origin, float width) {
-//   al::Vec3f base = origin.pos();
-//   al::Vec3f forward = origin.uf() * 0.3;
-
-//   // Manually offset branches left/right using ur() and uf()
-//   al::Vec3f left = base + forward + origin.ur() * -0.2;
-//   al::Vec3f right = base + forward + origin.ur() * 0.2;
-
-//   // Add simple triangle strip-style points
-//   mesh.vertex(left + origin.ur() * width);
-//   mesh.color(1, 1, 1, 0.5);
-//   mesh.vertex(left);
-//   mesh.color(1, 1, 1, 0.1);
-//   mesh.vertex(left - origin.ur() * width);
-//   mesh.color(1, 1, 1, 0.5);
-
-//   mesh.vertex(right + origin.ur() * width);
-//   mesh.color(1, 1, 1, 0.5);
-//   mesh.vertex(right);
-//   mesh.color(1, 1, 1, 0.1);
-//   mesh.vertex(right - origin.ur() * width);
-//   mesh.color(1, 1, 1, 0.5);
-// }
+*/
 
 class MyApp : public al::App {
 public:

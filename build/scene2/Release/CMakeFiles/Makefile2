@@ -454,7 +454,6 @@ clean: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/clean
 # Target rules for target CMakeFiles/scene2.dir
 
 # All Build rule for target.
-CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/imgui.dir/all
 CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/oscpack.dir/all
 CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/serial.dir/all
@@ -467,6 +466,7 @@ CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib
 CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all
 CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all
 CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all
+CMakeFiles/scene2.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scene2.dir/build.make CMakeFiles/scene2.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scene2.dir/build.make CMakeFiles/scene2.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucian/Desktop/201B/allolib_playground/softlight-sphere/build/scene2/Release/CMakeFiles --progress-num=81 "Built target scene2"
@@ -892,7 +892,6 @@ al_ext: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/CMake
 # Target rules for target /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir
 
 # All Build rule for target.
-/Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/imgui.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/oscpack.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/serial.dir/all
@@ -901,6 +900,7 @@ al_ext: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/CMake
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/glad/CMakeFiles/glad.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/rtaudio/CMakeFiles/rtaudio.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/rtmidi/CMakeFiles/rtmidi.dir/all
+/Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 	$(MAKE) $(MAKESILENT) -f /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/build.make /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/depend
 	$(MAKE) $(MAKESILENT) -f /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/build.make /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/assets3d/CMakeFiles/al_assets3d.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucian/Desktop/201B/allolib_playground/softlight-sphere/build/scene2/Release/CMakeFiles --progress-num= "Built target al_assets3d"
@@ -926,7 +926,6 @@ al_assets3d: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/
 # Target rules for target /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir
 
 # All Build rule for target.
-/Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/imgui.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/oscpack.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/serial.dir/all
@@ -935,6 +934,7 @@ al_assets3d: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/glad/CMakeFiles/glad.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/rtaudio/CMakeFiles/rtaudio.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/rtmidi/CMakeFiles/rtmidi.dir/all
+/Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 	$(MAKE) $(MAKESILENT) -f /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/build.make /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/depend
 	$(MAKE) $(MAKESILENT) -f /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/build.make /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/openvr/CMakeFiles/al_openvr.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucian/Desktop/201B/allolib_playground/softlight-sphere/build/scene2/Release/CMakeFiles --progress-num=58,59 "Built target al_openvr"
@@ -960,7 +960,6 @@ al_openvr: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/op
 # Target rules for target /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir
 
 # All Build rule for target.
-/Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/imgui.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/oscpack.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/serial.dir/all
@@ -969,6 +968,7 @@ al_openvr: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/op
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/glad/CMakeFiles/glad.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/rtaudio/CMakeFiles/rtaudio.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/rtmidi/CMakeFiles/rtmidi.dir/all
+/Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 	$(MAKE) $(MAKESILENT) -f /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/build.make /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/depend
 	$(MAKE) $(MAKESILENT) -f /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/build.make /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/soundfile/CMakeFiles/al_soundfile.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucian/Desktop/201B/allolib_playground/softlight-sphere/build/scene2/Release/CMakeFiles --progress-num=60 "Built target al_soundfile"
@@ -994,7 +994,6 @@ al_soundfile: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext
 # Target rules for target /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir
 
 # All Build rule for target.
-/Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/imgui.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/oscpack.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/CMakeFiles/serial.dir/all
@@ -1003,6 +1002,7 @@ al_soundfile: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/glad/CMakeFiles/glad.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/rtaudio/CMakeFiles/rtaudio.dir/all
 /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/external/rtmidi/CMakeFiles/rtmidi.dir/all
+/Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/all: /Users/lucian/Desktop/201B/allolib_playground/allolib/build/Release/CMakeFiles/al.dir/all
 	$(MAKE) $(MAKESILENT) -f /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/build.make /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/depend
 	$(MAKE) $(MAKESILENT) -f /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/build.make /Users/lucian/Desktop/201B/allolib_playground/allolib/build/al_ext/statedistribution/CMakeFiles/al_statedistribution.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucian/Desktop/201B/allolib_playground/softlight-sphere/build/scene2/Release/CMakeFiles --progress-num=61,62 "Built target al_statedistribution"

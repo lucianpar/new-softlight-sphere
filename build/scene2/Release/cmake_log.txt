@@ -17,6 +17,6 @@
 -- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE) 
 -- Using the multi-header code from /Users/lucian/Desktop/201B/allolib_playground/allolib/external/json/include/
 -- Using libsndfile: /opt/homebrew/lib/libsndfile.dylib
--- Configuring done (0.8s)
+-- Configuring done (1.1s)
 -- Generating done (0.3s)
 -- Build files have been written to: /Users/lucian/Desktop/201B/allolib_playground/softlight-sphere/build/scene2/Release
