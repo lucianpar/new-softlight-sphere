@@ -9,6 +9,7 @@
 #include "al/graphics/al_Shapes.hpp"
 #include "al/graphics/al_VAO.hpp"
 #include "al/graphics/al_VAOMesh.hpp"
+#include "al/io/al_ControlNav.hpp"
 #include "al/math/al_Random.hpp"
 #include "al/math/al_Vec.hpp"
 #include "al/scene/al_SynthSequencer.hpp"
@@ -43,6 +44,27 @@
 
 */
 
+void makePointLine(al::VAOMesh &mMesh, const al::Nav &head, float width,
+                   al::Vec3f inputColor) {
+  mMesh.vertex(head.pos() + head.ur() * width);
+  mMesh.vertex(head.pos() + head.ur() * (width / 2));
+  mMesh.vertex(head.pos() + head.ur() * (width / 4));
+  mMesh.vertex(head.pos());
+  mMesh.vertex(head.pos() - head.ur() * width);
+  mMesh.vertex(head.pos() - head.ur() * (width / 2));
+  mMesh.vertex(head.pos() - head.ur() * (width / 4));
+
+  mMesh.color(inputColor.x, inputColor.y, inputColor.z, 0.7);
+  mMesh.color(inputColor.x, inputColor.y, inputColor.z, 0.6);
+  mMesh.color(inputColor.x, inputColor.y, inputColor.z, 0.5);
+  mMesh.color(inputColor.x, inputColor.y, inputColor.z, 0.3);
+  mMesh.color(inputColor.x, inputColor.y, inputColor.z, 0.7);
+  mMesh.color(inputColor.x, inputColor.y, inputColor.z, 0.6);
+  mMesh.color(inputColor.x, inputColor.y, inputColor.z, 0.5);
+
+  // mMesh.update();
+}
+
 class MyApp : public al::App {
 public:
   al::Nav head; // for main ribbon
@@ -51,12 +73,13 @@ public:
   al::Vec3f reflectedTarget;
   float t{0};
   float a{0};
-  al::Parameter width{"Width", 0.2, 0, 0.2};
+  al::Parameter width{"Width", 0.05, 0, 0.2};
 
   // Meshes and Effects
 
-  al::VAOMesh ribbon{al::Mesh::LINE_STRIP_ADJACENCY};
+  al::VAOMesh ribbon{al::Mesh::POINTS};
   al::VAOMesh reflectedRibbon{al::Mesh::TRIANGLES};
+
   al::Mesh test;
   al::VAOMesh referenceMesh;
   al::Vec3f color1{0.1, 0.3, 0.4};
@@ -71,7 +94,7 @@ public:
   // Global Time
   double globalTime = 0;
   double sceneTime = 0;
-  float pointSize = 5.0f; // Particle size
+  float pointSize = 2.0f; // Particle size
 
   void onInit() override { gam::sampleRate(audioIO().framesPerSecond()); }
 
@@ -97,6 +120,8 @@ public:
     // head
     // target.set(al::rnd::uniformS(), al::rnd::uniformS(),
     // al::rnd::uniformS());
+
+    // makePointLine()
 
     ribbon.vertex(width, 0, 0);
     ribbon.normal(width, 0, 0);
@@ -136,12 +161,14 @@ public:
     //  nav().faceToward(nav().pos() * -0.5);
 
     //
-    ribbon.vertex(head.pos() + head.ur() * width);
-    ribbon.vertex(head.pos());
-    ribbon.vertex(head.pos() - head.ur() * width);
-    ribbon.color(color1.x, color1.y, color1.z, 0.7);
-    ribbon.color(color1.x, color1.y, color1.z, 0.3);
-    ribbon.color(color1.x, color1.y, color1.z, 0.7);
+    makePointLine(ribbon, head, width, color1);
+    // ribbon.vertex(head.pos() + head.ur() * width);
+    // ribbon.vertex(head.pos());
+    // ribbon.vertex(head.pos() - head.ur() * width);
+
+    // ribbon.color(color1.x, color1.y, color1.z, 0.7);
+    // ribbon.color(color1.x, color1.y, color1.z, 0.3);
+    // ribbon.color(color1.x, color1.y, color1.z, 0.7);
 
     reflectedRibbon.vertex(reflectedHead.pos() + reflectedHead.ur() * width);
     reflectedRibbon.vertex(reflectedHead.pos());
@@ -217,7 +244,8 @@ public:
     // g.blendTrans();
     g.depthTesting(true);
     // g.clear(1.0, 1.0, 0.9, 1.0);
-    g.clear(sin(sceneTime));
+    // g.clear(sin(sceneTime));
+    g.clear(0.9);
 
     // g.depthTesting(true);
     g.blending(true);
@@ -237,14 +265,14 @@ public:
     // glowShader.begin();
     // glowShader.uniform("u_time", (float)globalTime);
     // glowShader.uniform("u_resolution", al::Vec2f(width(), height()));
-    g.pointSize(2.5);
+
     g.meshColor();
     // g.color(0.0);
-    g.pointSize(10.0);
+    g.pointSize(pointSize);
     g.draw(referenceMesh);
     g.draw(ribbon);
-    g.draw(reflectedRibbon);
-    //  glowShader.end();
+    // g.draw(reflectedRibbon);
+    //   glowShader.end();
   }
 
   void onSound(al::AudioIOData &io) override { mSequencer.render(io); }

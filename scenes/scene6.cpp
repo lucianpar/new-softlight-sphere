@@ -24,6 +24,7 @@
 #include <string>
 
 // MY CUSTOM INCLUDES:
+#include "softlight-sphere/eoys-mesh-fx/autoPulse.hpp"
 #include "softlight-sphere/eoys-mesh-fx/ripple.hpp"
 #include "softlight-sphere/eoys-mesh-fx/scatter.hpp"
 #include "softlight-sphere/eoys-mesh-fx/vfxUtility.hpp"
@@ -52,40 +53,6 @@
 
 int sceneIndex = 1;
 
-// NEWER jelly FISH FUNCTION - this is super bad. will make myself or grab a
-// model this function was gpt'd - i got lazy and am still rapid prototyping
-void addJellyfish(al::Mesh &m, int numTentacles = 20, float radius = 0.5f,
-                  float height = 1.0f, float tentacleLength = 1.5f) {
-  m.reset();
-
-  // Create the bell using a scaled sphere mesh
-  al::Mesh bulb;
-  addSphere(bulb, radius, 50, 50);
-  bulb.primitive(al::Mesh::POINTS);
-  bulb.scale(1.0f, 0.7f, 0.9f); // squashed vertically and elongated in Z
-  for (int i = 0; i < bulb.vertices().size(); ++i) {
-    m.vertex(bulb.vertices()[i]);
-    m.color(1.0, 0.7, 0.9, 0.12); // soft translucent pink bulb
-  }
-
-  // Tentacles (closer inward base, less spread)
-  al::Vec3f center(0, 0, 0);
-  for (int i = 0; i < numTentacles; ++i) {
-    float angle = i * (2 * M_PI / numTentacles);
-    al::Vec3f base = center + al::Vec3f(cos(angle), sin(angle), 0) * radius *
-                                  0.4f;        // tighten base radius
-    al::Vec3f bendDir = al::Vec3f(0, 0, -1.0); // straight downward
-
-    for (int j = 0; j < 30; ++j) {
-      float offset = j * (tentacleLength / 30.0f);
-      al::Vec3f point = base + bendDir * offset;
-      m.vertex(point);
-      m.color(1.0, 0.5, 0.7, 0.05); // trailing soft pink
-    }
-  }
-  m.primitive(al::Mesh::POINTS);
-}
-
 // using namespace al;
 
 class MyApp : public al::App {
@@ -93,51 +60,37 @@ public:
   ////INITIAL OBJECTS AND DECLARATIONS////
   // ->
   al::Light light;
-  // Light light;
   al::Material material;
 
-  //// jellyT DECLARATIONS FOR SCENE 1 ////
+  //// SCENE 6 DECLARE START
 
-  // MESHES//
+  // scene 6 MESHES
   al::VAOMesh blobMesh;
   al::VAOMesh jellyCreatureMesh;
-  std::vector<al::Nav> blobs;
+  std::vector<al::Nav> jellies;
   std::vector<al::Vec3f> velocity;
   std::vector<al::Vec3f> force;
+
+  // SCENE 6 PARAMS
   float scene2Boundary = 30.0f;
   bool inSphereScene2 = true;
-  float blobSeperationThresh = 2.0f;
+  float jellieseperationThresh = 2.0f;
   int nAgentsScene2 = 30;
-  float blobsSpeedScene2 = 0.1;
-  float blobSizeScene2 = 1.8;
-
+  float jelliesSpeedScene2 = 0.1;
+  float jelliesizeScene2 = 0.5;
+  float pointSize = 1.0;
   std::vector<al::Vec3f> colorPallete = {
-      {0.9f, 0.0f, 0.4}, {0.11, 0.2, 0.46}, {0.11, 0.44, 0.46}};
+      {1.0f, 0.0f, 0.5}, {0.11, 0.2, 0.46}, {0.11, 0.44, 0.46}};
 
-  // MESH EFFECTS//
-  VertexEffectChain blobsEffectChain;
-  RippleEffect blobsRippleX;
-  RippleEffect blobsRippleY;
-  RippleEffect blobsRippleZ;
-
+  // SCENE 6  MESH EFFECTS//
+  AutoPulseEffect jellyPulse;
   VertexEffectChain jellyEffectChain;
-  RippleEffect jellyRipple;
 
-  // set up auto pulse with base verts
-
-  //// END DECLARATIONS FOR SCENE 1 ////
+  // SCENE 6 DECLARE END
 
   // GLOBAL TIME PARAMS//
   double globalTime = 0;
   double sceneTime = 0;
-  // int sceneIndex; -- moved out of app to be global
-
-  ////DECLARE VALUES FOR EVENT TIMES////
-
-  // SCENE 1
-
-  // karl code -- need to figure out where to put this -- maybe just in
-  // declerations in main file
 
   al::Vec3f randomVec3f(float scale) {
     return al::Vec3f(al::rnd::uniformS(), al::rnd::uniformS(),
@@ -145,17 +98,12 @@ public:
            scale;
   }
 
-  // SCENE 2
-
-  // float track2jellyt = 119;
-
-  // i.e. -- moveOutEvent1, jellytRipplingEvent1
-
   void onInit() override { gam::sampleRate(audioIO().framesPerSecond()); }
 
   void onCreate() override {
     ////BIOLERPLATE////
-    nav().pos(al::Vec3d(0, 0, 0)); // Set the camera to view the scene
+    // nav().pos(al::Vec3d(jellies[0].pos())); // Set the camera to view the
+    // scene
     sequencer().playSequence();
 
     // al::Vec3f randomVec3f(float scale) {
@@ -169,16 +117,17 @@ public:
 
     // std::vector<al::Vec3f> colorPallete = {{0.9f, 0.0f, 0.4}, {0.4f, 0.0f,
     // 0.9}};
-    addSphere(blobMesh, blobSizeScene2, 40, 40);
-    blobMesh.primitive(al::Mesh::TRIANGLES);
-    for (int i = 0; i < blobMesh.vertices().size(); i++) {
-      // al::Vec3f newColor = colorPallete[i%2];
-      // blobMesh.color(newColor.x,newColor.y,newColor.z, 0.6);
-    }
 
     blobMesh.generateNormals();
 
-    addJellyfish(jellyCreatureMesh);
+    addSphere(jellyCreatureMesh, jelliesizeScene2, 30, 30);
+    jellyCreatureMesh.primitive(al::Mesh::POINTS);
+    // cube adds sort of particle surrounding
+    // addCube(mesh, false, 2.0);
+    // mesh.primitive(Mesh::POINTS);
+    jellyCreatureMesh.scale(1.0, 0.7, 0.9);
+    jellyPulse.setBaseMesh(jellyCreatureMesh.vertices());
+    jellyPulse.setParams(0.3, 0.2, 1);
 
     jellyCreatureMesh.update();
 
@@ -192,49 +141,19 @@ public:
                al::rnd::uniformS())
           .normalize();
       // p.set(randomVec3f(5), randomVec3f(1));
-      blobs.push_back(p);
+      jellies.push_back(p);
       // velocity.push_back(al::Vec3f(0));
       // force.push_back(al::Vec3f(0));
     }
 
-    blobMesh.update();
+    nav().pos(al::Vec3d(jellies[0].pos())); // Set the camera to view the scene
 
-    blobsRippleX.setParams(0.2, 0.1, 1.0, 'x');
-    blobsRippleZ.setParams(0.4, 0.1, 1.0, 'z');
-    // blobsRippleY.setParams( 0.01,  0.1, 1.0, 'y');
-    blobsEffectChain.pushBack(&blobsRippleZ);
-    // blobsEffectChain.pushBack(&blobsRippleY);
-    blobsEffectChain.pushBack(&blobsRippleX);
-
-    jellyRipple.setParams(1.0, 1.0, 1.0, 'z');
-
-    jellyEffectChain.pushBack(&jellyRipple);
-
-    scene2Boundary = 1.0;
-
-    // end lighting test
-
-    // BOUNDARY MESH
-    //  addSphere(boundarySphere, 7.5);
-    //  boundarySphere.primitive((al::Mesh::LINES));
-
-    ///////
-
-    // SCENE 1 STUFF INITS
-
-    ////CREATE MY MESHES////
-
-    // NEED TO RESET TO RELATIVE PATHS, NOT HARDCODED
-
-    // SCENE 2 STUFF INITS
+    jellyEffectChain.pushBack(&jellyPulse);
   }
 
   ////BASIC TRIGGERING////
   bool onKeyDown(const al::Keyboard &k) override {
 
-    // if (k.key() == '1') {
-    //  If the space key is pressed, we will trigger the sequencer
-    // sequencer().playSequence();
     if (k.key() >= 49 && k.key() <= 54) {
       sceneIndex = k.key() - 48;
       std::cout << "pressed key: " << sceneIndex << std::endl;
@@ -262,110 +181,46 @@ public:
     std::cout << "global time: " << globalTime << std::endl;
     fflush(stdout);
 
-    if (sceneTime >= 0) {
-      // boundary is initially set super small so they are constrained
-      scene2Boundary = 15.0;
-    }
-    if (sceneTime >= 0 && sceneTime <= 1.0) {
-      blobsSpeedScene2 = 3.0;
-    }
-    if (sceneTime >= 1.0 && sceneTime <= 5.0) {
-      blobsSpeedScene2 = 0.1;
-    }
+    ///// SCENE 6  ANIMATE ->>>>>
 
-    if (sceneTime >= 5.0) {
-      blobsSpeedScene2 = 0.2;
-    }
-    if (sceneTime >= 8.0) {
-      blobsSpeedScene2 = 0.05;
-    }
-    if (sceneTime >= 11.0) {
-      blobsSpeedScene2 = 0.3;
-    }
-    // should we call in the audio callback instead?
+    // SCENE 6 CAMERA
+    nav().pos(al::Vec3d(jellies[0].pos()));
+    // camernav().turnF(0.6);
 
-    //// PROCESS MESH EFFECTS ////
-    // bodyEffectChain.process(bodyMesh, globalTime);
-    // openingSphereEffectChain.process(openingSphereMesh, globalTime);
-    // openingSphereScatter.stop(true);
-    // bodyScatter.triggerOut(true, bodyMesh);
+    // SCENE 6 MAIN LOGIC
 
-    // bodyAttractor.processThomas(bodyMesh, globalTime, 0.001);
-    // SCENE SPECIFIC //
-
-    for (int i = 0; i < blobs.size(); ++i) {
+    for (int i = 0; i < jellies.size(); ++i) {
       // inSphereScene2 = true;
-      if (blobs[i].pos().mag() >= scene2Boundary) {
-        blobs[i].faceToward(blobs[i].uf() * (-1.0), 0.1);
-        blobs[i].moveF(blobSizeScene2);
+      if (jellies[i].pos().mag() >= scene2Boundary) {
+        jellies[i].faceToward(jellies[i].uf() * (-1.0), 0.1);
+        jellies[i].moveF(jelliesizeScene2);
       }
-      // checking blob against every other blob. turn around if too close to
-      // eachother
-      //  for (int j = 0; j < blobs.size(); ++j){
-      //    if (blobs[i].pos() != blobs[j].pos()){
-      //     float distance = (blobs[i].pos() - blobs[j].pos()).mag();
-      //      if(distance <= blobSeperationThresh)
-      //      blobs[i].faceToward(blobs[i].uf()*-1.0, 0.1);
-      //      blobs[i].moveF(10.0);
 
-      //   }
-      // }
+      jellies[i].moveF(1.0);
 
-      // if inSphere()
-      // agent[i].faceToward(clusterCenter*invertDir*run, 0.03);
-      // blobs[i].faceToward(blobs[i-1].pos() * (-1), 0.04);
-      blobs[i].moveF(1.0);
-
-      blobs[i].step(
-          sceneTime * blobsSpeedScene2 /
+      jellies[i].step(
+          sceneTime * jelliesSpeedScene2 /
           (sceneTime +
            0.1)); // scene time vs dt - unsure what works better for this
-      // times time step -- make this "react to audio changes". division is to
-      // deal with step accumulation
-      // blobs[i].nudge()
     }
 
-    // blobsEffectChain.process(blobMesh, sceneTime);
+    // SCENE 6 UPDATE AND PROCESS
+    jellyEffectChain.process(jellyCreatureMesh, sceneTime);
 
-    // jellyEffectChain.process(jellyCreatureMesh, sceneTime);
-
-    blobMesh.update();
-
-    // velocity[k] += force[k] * dt;
-    // blobs[k].pos() += velocity[k] * dt;
-
-    // MESH EFFECT SEQUENCING//
-
-    // SCENE 1 -- from
-
-    // if (globalTime == 1){
-    //   bodyScatter.triggerOut(true, bodyMesh);
-    // }
-
-    // bodyAttractor.processThomas(bodyMesh, globalTime, 0.0001);
-    // bodyMesh.scale(1.01);
-
-    // newSpeed;
-
-    // SCENE 2 -- from
+    jellyCreatureMesh.update();
   }
   // END OF ANIMATE CALLBACK
-
-  //// INCREMENT VALUES FOR DRAW ////
-  float shellIncrementScene1;
-  float particleIncrementScene1;
-  float pointSize = 3.0;
 
   void onDraw(al::Graphics &g) override {
 
     //// SCENE 1 jellyT OF DRAW /////
     if (sceneIndex == 1) {
 
-      // THIS SEQUENCE MAKES THE SHELL APPEAR
+      // SCENE 6 WORLD LIGHTING
       glEnable(GL_BLEND);
       g.blendTrans();
       g.depthTesting(true);
-      g.clear(0.0, 0.0, 0.09 + ((sceneTime / (118 - 334)) * 0.8));
+      g.clear(0.1, 0.0, 0.3);
 
       g.lighting(true);
       // lighting from karl's example
@@ -373,62 +228,30 @@ public:
       light.ambient(al::RGB(0.5, (1.0), 1.0));
       light.diffuse(al::RGB(1, 1, 0.5));
       g.light(light);
-      material.specular(light.diffuse());
-      material.shininess(50);
+      material.specular(light.diffuse() * 2.0);
+      material.shininess(300);
       g.material(material);
       // end of lighting for karl's example
 
       glDepthMask(GL_FALSE); // re enable later if needed
 
-      // PARTICLES SEQUENCE 1
+      // SCENE 6 SEQUENCING
 
       g.pointSize(pointSize);
-      // g.color(1.0,1.0,1.0,0.2);
 
-      for (int i = 0; i < blobs.size(); ++i) {
-        al::Vec3f newColor = colorPallete[i % 3];
+      for (int i = 0; i < jellies.size(); ++i) {
+        al::Vec3f newColor = colorPallete[0];
 
         g.pushMatrix();
-        // g.color(1.0,sin(0.0+fearColorReact),0.5);
-        g.translate(blobs[i].pos());
-        g.rotate(blobs[i].quat());
-        // g.meshColor();
-        //  g.color(newColor.x, newColor.y, newColor.z, 0.25);
-        // draw blobs:
-        if (i % 2 == 1) {
-          g.color(newColor.x, newColor.y, newColor.z,
-                  0.4 + (sin(sceneTime * 2.0) * 0.1));
-          // g.draw(blobMesh);
-        }
-        // draw creatures:
-        else {
-          g.color(newColor.x + 0.4, newColor.y + 0.4, newColor.z + 0.4,
-                  0.4 + (sin(sceneTime * 0.5) * 0.1));
-          g.draw(jellyCreatureMesh);
-          // g.color(newColor.x + 0.4, newColor.y + 0.4, newColor.z + 0.4, 1.0);
-        }
+        g.translate(jellies[i].pos());
+        g.rotate(jellies[i].quat());
+        g.color(newColor.x, newColor.y, newColor.z, 0.7);
+        g.draw(jellyCreatureMesh);
         g.popMatrix();
-        // blobMesh.update();
       }
-      // g.meshColor();
+    }
 
-      // if (sceneTime >= particlesAppearEvent) {
-      // g.meshColor();
-      // }
-
-      // MAIN COLOR SEQUENCE //
-      // color sequence
-      // if(sceneTime<=particlesAppearEvent){
-      // g.color(0+(sceneTime/particlesAppearEvent));}
-      // else{
-      //   //g.color(1.0);
-      // }
-
-      // only draw once particles have dispersed
-
-      // g.draw(boundarySphere);
-
-    } //// SCENE 1 END OF DRAW /////
+    ///// END SCENE 6  ANIMATE ->>>>>
 
     mSequencer.render(g);
   }

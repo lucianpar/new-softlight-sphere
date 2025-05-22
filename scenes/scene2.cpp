@@ -36,6 +36,7 @@
 // #include "softlight-sphere/imageToMesh.hpp"
 // #include "softlight-sphere/imageToSphere.hpp"
 #include "softlight-sphere/utility/attractors.hpp"
+#include "softlight-sphere/utility/creatures.hpp"
 #include "softlight-sphere/utility/imageColorToMesh.hpp"
 
 /* TO DO:
@@ -52,45 +53,6 @@
 
 int sceneIndex = 1;
 
-// NEWER STAR FISH FUNCTION
-// this function was gpt'd - i got lazy and am still rapid prototyping
-void addStarfish(al::Mesh &m, int arms = 5, float armLength = 1.0f,
-                 float armWidth = 0.1f) {
-  m.primitive(al::Mesh::TRIANGLES_ADJACENCY);
-  m.reset();
-
-  al::Vec3f center(0, 0, 0);
-
-  for (int i = 0; i < arms; ++i) {
-    float angle = i * (2 * M_PI / arms);
-    float nextAngle = angle + M_PI / arms; // for width offset
-
-    // Tip direction
-    al::Vec3f dir(cos(angle), sin(angle), 0);
-    al::Vec3f perp(-dir.y, dir.x, 0); // perpendicular for width
-
-    // Arm tip vertex
-    al::Vec3f tip = dir * armLength;
-    // Base left and right for width
-    al::Vec3f baseLeft = center + perp * armWidth * 0.5f;
-    al::Vec3f baseRight = center - perp * armWidth * 0.5f;
-
-    // Triangle: baseLeft -> tip -> baseRight
-    m.vertex(baseLeft);
-    m.vertex(tip);
-    m.vertex(baseRight);
-
-    // Color per arm (optional gradient)
-    float hue = float(i) / arms;
-    al::Color c = al::HSV(hue, 0.8, 0.9);
-    m.color(c);
-    m.color(c);
-    m.color(c);
-  }
-}
-
-// using namespace al;
-
 class MyApp : public al::App {
 public:
   ////INITIAL OBJECTS AND DECLARATIONS////
@@ -98,22 +60,37 @@ public:
   al::Light light;
   // Light light;
   al::Material material;
+  // GLOBAL TIME PARAMS//
+  double globalTime = 0;
+  double sceneTime = 0;
+
+  al::Vec3f randomVec3f(float scale) {
+    return al::Vec3f(al::rnd::uniformS(), al::rnd::uniformS(),
+                     al::rnd::uniformS()) *
+           scale;
+  }
 
   //// START DECLARATIONS FOR SCENE 1 ////
 
-  // MESHES//
+  // SCENE 2 DECLARE /////
+  //  MESHES//
   al::VAOMesh blobMesh;
   al::VAOMesh starCreatureMesh;
   std::vector<al::Nav> blobs;
   std::vector<al::Vec3f> velocity;
   std::vector<al::Vec3f> force;
+  Creature creature;
+  // PARAMS
   float scene2Boundary = 30.0f;
   bool inSphereScene2 = true;
   float blobSeperationThresh = 2.0f;
   int nAgentsScene2 = 30;
   float blobsSpeedScene2 = 0.1;
   float blobSizeScene2 = 1.8;
-
+  float shellIncrementScene1;
+  float particleIncrementScene1;
+  float pointSize = 3.0;
+  // Creature creature;
   std::vector<al::Vec3f> colorPallete = {
       {0.9f, 0.0f, 0.4}, {0.11, 0.2, 0.46}, {0.11, 0.44, 0.46}};
 
@@ -126,33 +103,7 @@ public:
   VertexEffectChain starEffectChain;
   RippleEffect starRipple;
 
-  // set up auto pulse with base verts
-
-  //// END DECLARATIONS FOR SCENE 1 ////
-
-  // GLOBAL TIME PARAMS//
-  double globalTime = 0;
-  double sceneTime = 0;
-  // int sceneIndex; -- moved out of app to be global
-
-  ////DECLARE VALUES FOR EVENT TIMES////
-
-  // SCENE 1
-
-  // karl code -- need to figure out where to put this -- maybe just in
-  // declerations in main file
-
-  al::Vec3f randomVec3f(float scale) {
-    return al::Vec3f(al::rnd::uniformS(), al::rnd::uniformS(),
-                     al::rnd::uniformS()) *
-           scale;
-  }
-
-  // SCENE 2
-
-  // float track2Start = 119;
-
-  // i.e. -- moveOutEvent1, StartRipplingEvent1
+  //// SCENE 2 END DECLARATIONS ////
 
   void onInit() override { gam::sampleRate(audioIO().framesPerSecond()); }
 
@@ -161,31 +112,16 @@ public:
     nav().pos(al::Vec3d(0, 0, 0)); // Set the camera to view the scene
     sequencer().playSequence();
 
-    // al::Vec3f randomVec3f(float scale) {
-    //   return Vec3f(rnd::uniformS(), rnd::uniformS(), rnd::uniformS()) *
-    //   scale;
-    // }
-
-    // //INITIALIZE LIGHTING
-
     nav().pos(0, 0, 0);
 
-    // std::vector<al::Vec3f> colorPallete = {{0.9f, 0.0f, 0.4}, {0.4f, 0.0f,
-    // 0.9}};
+    // SCENE 2 CREATE /////
     addSphere(blobMesh, blobSizeScene2, 40, 40);
     blobMesh.primitive(al::Mesh::TRIANGLES);
     for (int i = 0; i < blobMesh.vertices().size(); i++) {
-      // al::Vec3f newColor = colorPallete[i%2];
-      // blobMesh.color(newColor.x,newColor.y,newColor.z, 0.6);
     }
-
     blobMesh.generateNormals();
-
-    addStarfish(starCreatureMesh);
-
+    creature.addStarfish(starCreatureMesh);
     starCreatureMesh.update();
-
-    // blobMesh.update();
 
     for (int b = 0; b < nAgentsScene2; ++b) {
       al::Nav p;
@@ -194,42 +130,20 @@ public:
           .set(al::rnd::uniformS(), al::rnd::uniformS(), al::rnd::uniformS(),
                al::rnd::uniformS())
           .normalize();
-      // p.set(randomVec3f(5), randomVec3f(1));
       blobs.push_back(p);
-      // velocity.push_back(al::Vec3f(0));
-      // force.push_back(al::Vec3f(0));
     }
 
     blobMesh.update();
 
     blobsRippleX.setParams(0.2, 0.1, 1.0, 'x');
     blobsRippleZ.setParams(0.4, 0.1, 1.0, 'z');
-    // blobsRippleY.setParams( 0.01,  0.1, 1.0, 'y');
     blobsEffectChain.pushBack(&blobsRippleZ);
-    // blobsEffectChain.pushBack(&blobsRippleY);
     blobsEffectChain.pushBack(&blobsRippleX);
-
     starRipple.setParams(1.0, 1.0, 1.0, 'z');
-
     starEffectChain.pushBack(&starRipple);
-
     scene2Boundary = 1.0;
 
-    // end lighting test
-
-    // BOUNDARY MESH
-    //  addSphere(boundarySphere, 7.5);
-    //  boundarySphere.primitive((al::Mesh::LINES));
-
-    ///////
-
-    // SCENE 1 STUFF INITS
-
-    ////CREATE MY MESHES////
-
-    // NEED TO RESET TO RELATIVE PATHS, NOT HARDCODED
-
-    // SCENE 2 STUFF INITS
+    // SCENE 2 CREAT END /////
   }
 
   ////BASIC TRIGGERING////
@@ -265,6 +179,8 @@ public:
     std::cout << "global time: " << globalTime << std::endl;
     fflush(stdout);
 
+    // SCENE 2 ANIMATE /////
+
     if (sceneTime >= 0) {
       // boundary is initially set super small so they are constrained
       scene2Boundary = 15.0;
@@ -285,16 +201,6 @@ public:
     if (sceneTime >= 11.0) {
       blobsSpeedScene2 = 0.3;
     }
-    // should we call in the audio callback instead?
-
-    //// PROCESS MESH EFFECTS ////
-    // bodyEffectChain.process(bodyMesh, globalTime);
-    // openingSphereEffectChain.process(openingSphereMesh, globalTime);
-    // openingSphereScatter.stop(true);
-    // bodyScatter.triggerOut(true, bodyMesh);
-
-    // bodyAttractor.processThomas(bodyMesh, globalTime, 0.001);
-    // SCENE SPECIFIC //
 
     for (int i = 0; i < blobs.size(); ++i) {
       // inSphereScene2 = true;
@@ -302,30 +208,10 @@ public:
         blobs[i].faceToward(blobs[i].uf() * (-1.0), 0.1);
         blobs[i].moveF(blobSizeScene2);
       }
-      // checking blob against every other blob. turn around if too close to
-      // eachother
-      //  for (int j = 0; j < blobs.size(); ++j){
-      //    if (blobs[i].pos() != blobs[j].pos()){
-      //     float distance = (blobs[i].pos() - blobs[j].pos()).mag();
-      //      if(distance <= blobSeperationThresh)
-      //      blobs[i].faceToward(blobs[i].uf()*-1.0, 0.1);
-      //      blobs[i].moveF(10.0);
 
-      //   }
-      // }
-
-      // if inSphere()
-      // agent[i].faceToward(clusterCenter*invertDir*run, 0.03);
-      // blobs[i].faceToward(blobs[i-1].pos() * (-1), 0.04);
       blobs[i].moveF(1.0);
 
-      blobs[i].step(
-          sceneTime * blobsSpeedScene2 /
-          (sceneTime +
-           0.1)); // scene time vs dt - unsure what works better for this
-      // times time step -- make this "react to audio changes". division is to
-      // deal with step accumulation
-      // blobs[i].nudge()
+      blobs[i].step(sceneTime * blobsSpeedScene2 / (sceneTime + 0.1));
     }
 
     blobsEffectChain.process(blobMesh, sceneTime);
@@ -334,37 +220,17 @@ public:
 
     blobMesh.update();
 
-    // velocity[k] += force[k] * dt;
-    // blobs[k].pos() += velocity[k] * dt;
-
-    // MESH EFFECT SEQUENCING//
-
-    // SCENE 1 -- from
-
-    // if (globalTime == 1){
-    //   bodyScatter.triggerOut(true, bodyMesh);
-    // }
-
-    // bodyAttractor.processThomas(bodyMesh, globalTime, 0.0001);
-    // bodyMesh.scale(1.01);
-
-    // newSpeed;
-
-    // SCENE 2 -- from
+    // SCENE 2 ANIMATE END /////
   }
-  // END OF ANIMATE CALLBACK
 
-  //// INCREMENT VALUES FOR DRAW ////
-  float shellIncrementScene1;
-  float particleIncrementScene1;
-  float pointSize = 3.0;
+  // END OF ANIMATE CALLBACK
 
   void onDraw(al::Graphics &g) override {
 
     //// SCENE 1 START OF DRAW /////
     if (sceneIndex == 1) {
 
-      // THIS SEQUENCE MAKES THE SHELL APPEAR
+      // SCENE 2 DRAW ////
       glEnable(GL_BLEND);
       g.blendTrans();
       g.depthTesting(true);
@@ -379,14 +245,10 @@ public:
       material.specular(light.diffuse() * 0.3);
       material.shininess(50);
       g.material(material);
-      // end of lighting for karl's example
 
       glDepthMask(GL_FALSE); // re enable later if needed
 
-      // PARTICLES SEQUENCE 1
-
       g.pointSize(pointSize);
-      // g.color(1.0,1.0,1.0,0.2);
 
       for (int i = 0; i < blobs.size(); ++i) {
         al::Vec3f newColor = colorPallete[i % 3];
@@ -395,41 +257,21 @@ public:
         // g.color(1.0,sin(0.0+fearColorReact),0.5);
         g.translate(blobs[i].pos());
         g.rotate(blobs[i].quat());
-        // g.meshColor();
-        //  g.color(newColor.x, newColor.y, newColor.z, 0.25);
-        // draw blobs:
+
         if (i % 2 == 1) {
           g.color(newColor.x, newColor.y, newColor.z,
                   0.4 + (sin(sceneTime * 2.0) * 0.1));
           g.draw(blobMesh);
         }
-        // draw creatures:
+
         else {
           g.color(newColor.x + 0.4, newColor.y + 0.4, newColor.z + 0.4,
                   0.4 + (sin(sceneTime * 0.5) * 0.1));
           g.draw(starCreatureMesh);
-          // g.color(newColor.x + 0.4, newColor.y + 0.4, newColor.z + 0.4, 1.0);
         }
         g.popMatrix();
-        // blobMesh.update();
       }
-      // g.meshColor();
-
-      // if (sceneTime >= particlesAppearEvent) {
-      // g.meshColor();
-      // }
-
-      // MAIN COLOR SEQUENCE //
-      // color sequence
-      // if(sceneTime<=particlesAppearEvent){
-      // g.color(0+(sceneTime/particlesAppearEvent));}
-      // else{
-      //   //g.color(1.0);
-      // }
-
-      // only draw once particles have dispersed
-
-      // g.draw(boundarySphere);
+      // SCENE 2 DRAW END ////
 
     } //// SCENE 1 END OF DRAW /////
 

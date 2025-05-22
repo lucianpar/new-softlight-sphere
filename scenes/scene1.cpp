@@ -42,41 +42,29 @@ fix shader????
 fix ripple speed and scaling
 */
 
-// Shader Program
-al::ShaderProgram glowShader;
-
 int sceneIndex = 1;
 
 class MyApp : public al::App {
 public:
-  // Meshes and Effects
-  al::VAOMesh attractorMesh;
-  al::VAOMesh bodyMesh;
-  objParser newObjParser;
-  Attractor mainAttractor;
-  VertexEffectChain mainEffectChain;
-  RippleEffect mainRippleY;
-  RippleEffect mainRippleX;
-  RippleEffect mainRippleZ;
-
-  VertexEffectChain bodyEffectChain;
-  ;
-  ScatterEffect bodyScatter;
-
   // Global Time
   double globalTime = 0;
   double sceneTime = 0;
-  float pointSize = 5.0f; // Particle size
 
-  ////DECLARE VALUES FOR EVENT TIMES////
+  ////SCENE 1 DECLARE  //////
 
-  // SCENE 1
+  // SCENE 1 params
   float rippleAmplitudeScene1 = 0.0;
   float rippleSpeedXScene1 = 0.2;
   float rippleSpeedYScene1 = 0.2;
   float rippleSpeedZScene1 = 0.3;
   float attractorSpeedScene1;
   float startingBodyAlpha = 0.00001;
+  float bodyAlphaIncScene1 = 0.0;
+  float pointSize = 5.0f; // Particle size
+  float shellIncrementScene1;
+  float particleIncrementScene1;
+
+  // SCENE 1 sequencing
 
   float shellTurnsWhiteEvent = 15.0f;
 
@@ -100,13 +88,29 @@ public:
 
   float moveInEvent = 85.0;
 
+  // scene 1 Meshes and Effects
+  al::VAOMesh attractorMesh;
+  al::VAOMesh bodyMesh;
+  objParser newObjParser;
+  Attractor mainAttractor;
+  VertexEffectChain mainEffectChain;
+  RippleEffect mainRippleY;
+  RippleEffect mainRippleX;
+  RippleEffect mainRippleZ;
+
+  VertexEffectChain bodyEffectChain;
+  ;
+  ScatterEffect bodyScatter;
+
+  // SCENE 1 DECLARE END //////
+
   void onInit() override { gam::sampleRate(audioIO().framesPerSecond()); }
 
   void onCreate() override {
     nav().pos(al::Vec3d(0, 0, 0));
     sequencer().playSequence();
 
-    // initialize body
+    // SCENE 1 CREATE ////
     newObjParser.parse("/Users/lucian/Desktop/201B/allolib_playground/"
                        "softlight-sphere/assets/BaseMesh.obj",
                        bodyMesh);
@@ -123,15 +127,12 @@ public:
     al::addSphere(attractorMesh, 10.0f, 100, 100);
     attractorMesh.primitive(al::Mesh::LINES); // switch back to lines
     for (int i = 0; i < attractorMesh.vertices().size(); ++i) {
-      attractorMesh.color(1.0, 0.6, 0.2,
-                          0.4); // Orange particles with alpha transparency
+      attractorMesh.color(1.0, 0.6, 0.2, 0.4);
     }
     std::cout << "made attractor sphere with vertices # : "
               << attractorMesh.vertices().size() << std::endl;
-    // attractorMesh.update();
 
-    // effect setting
-
+    // SET EFFEFCTS
     bodyScatter.setBaseMesh(bodyMesh.vertices());
     bodyScatter.setParams(0.5, 20.0);
     bodyScatter.setScatterVector(bodyMesh);
@@ -151,58 +152,14 @@ public:
 
     attractorMesh.update();
 
-    // Compile Shader
-
-    // shader currently not working
-    glowShader.compile(R"(
-    #version 330 core
-    layout (location = 0) in vec3 aPos;
-    layout (location = 1) in vec4 aColor;
-    
-    out vec4 vColor;
-    out vec2 fragUV;
-    
-    uniform highp mat4 u_model;
-    uniform highp mat4 u_view;
-    uniform highp mat4 u_projection;
-
-    void main() {
-        vColor = aColor;
-        gl_Position = u_projection * u_view * u_model * vec4(aPos, 1.0);
-        fragUV = (gl_Position.xy / gl_Position.w) * 0.5 + 0.5; 
-        gl_PointSize = 12.0;
-    }
-)",
-
-                       R"(
-    #version 330 core
-    in vec4 vColor;
-    in vec2 fragUV;
-    out vec4 fragColor;
-    
-    uniform highp float u_time;
-    uniform highp vec2 u_resolution;
-    uniform highp vec2 u_center;
-
-    void main() {
-        // Ensure the uniform is actively used
-        float dist = length(fragUV - u_center);
-        float glowIntensity = exp(-dist * dist * 10.0); 
-
-        // Apply glow effect
-        fragColor = vColor * glowIntensity;
-        fragColor.a = vColor.a * glowIntensity;
-    }
-)");
-    glowShader.link();
+    // SCENE 1 CREATE END
   }
-  float bodyAlphaIncScene1 = 0.0;
   void onAnimate(double dt) override {
     globalTime += dt;
     sceneTime += dt;
     // std::cout << sceneTime << std::endl;
 
-    // Apply Attractor Effect
+    // SCENE 1 ANIMATE
     if (sceneTime < particlesSlowRippleEvent) {
       mainAttractor.processThomas(attractorMesh, sceneTime, 0);
     }
@@ -260,12 +217,13 @@ public:
 
     bodyEffectChain.process(bodyMesh, sceneTime);
     bodyMesh.update();
+
+    // SCENE 1 ANIMATE END
   }
 
-  float shellIncrementScene1;
-  float particleIncrementScene1;
-
   void onDraw(al::Graphics &g) override {
+
+    // SCENE 1 DRAW /////
 
     if (sceneTime < shellTurnsWhiteEvent) {
       shellIncrementScene1 = ((sceneTime) / (shellTurnsWhiteEvent));
@@ -276,14 +234,8 @@ public:
     }
     g.depthTesting(true);
     g.blending(true);
-    g.blendAdd(); // Additive blending for glowing effect
+    g.blendAdd();
 
-    // Use Custom Glow Shader
-    glowShader.begin();
-    glowShader.uniform("u_time", (float)sceneTime);
-    glowShader.uniform("u_resolution", al::Vec2f(width(), height()));
-    glowShader.uniform("u_center",
-                       al::Vec3f(0.0, 0.0, 0.0)); // Center of the glow effect
     g.pointSize(pointSize);
     g.meshColor();
     g.draw(attractorMesh);
@@ -291,7 +243,8 @@ public:
     if (sceneTime >= bodyCloudAppear) {
       g.draw(bodyMesh);
     }
-    glowShader.end();
+
+    // SCENE 1 END /////
   }
 
   void onSound(al::AudioIOData &io) override { mSequencer.render(io); }
