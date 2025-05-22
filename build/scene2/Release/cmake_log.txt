@@ -1,0 +1,22 @@
+-- ==== Configuring Gamma.
+-- Checking for module 'libsndfile'
+--   Package 'libsndfile' not found
+-- Found SNDFILE 
+-- libsndfile: /opt/homebrew/lib/libsndfile.dylib
+-- threading: 
+-- Using Cocoa for window creation
+-- Checking for module 'jack'
+--   Package 'jack' not found
+-- Checking for module 'libpulse-simple'
+--   Package 'libpulse-simple' not found
+-- Compiling with support for: core
+-- Checking for module 'jack'
+--   Package 'jack' not found
+-- Could NOT find ALSA (missing: ALSA_LIBRARY ALSA_INCLUDE_DIR) 
+-- Compiling with support for: coremidi
+-- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE) 
+-- Using the multi-header code from /Users/lucian/Desktop/201B/allolib_playground/allolib/external/json/include/
+-- Using libsndfile: /opt/homebrew/lib/libsndfile.dylib
+-- Configuring done (0.8s)
+-- Generating done (0.3s)
+-- Build files have been written to: /Users/lucian/Desktop/201B/allolib_playground/softlight-sphere/build/scene2/Release
