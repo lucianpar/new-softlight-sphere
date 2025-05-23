@@ -73,11 +73,11 @@ public:
   Creature creature;
 
   // SCENE 6 PARAMS
-  float scene2Boundary = 15.0f;
+  float scene2Boundary = 20.0f;
   bool inSphereScene2 = true;
   float jellieseperationThresh = 2.0f;
-  int nAgentsScene6 = 5;
-  float jelliesSpeedScene2 = 2.0;
+  int nAgentsScene6 = 3;
+  float jelliesSpeedScene2 = 4.0;
   float jelliesizeScene2 = 2.5;
   float pointSize = 2.5;
   std::vector<al::Vec3f> colorPallete = {
@@ -192,18 +192,24 @@ public:
     // SCENE 6 MAIN LOGIC
 
     for (int i = 0; i < jellies.size(); ++i) {
-      // Boundary reflection: if out of bounds, slowly turn around
+      // llm helped with movement
+      float t = globalTime + i * 10.0f; // moving at slightly diff rates
+
+      // drifting sort of
+      float wobbleAmount = 0.02f * std::sin(t * 0.7f);
+      jellies[i].turnF(0.007f + wobbleAmount); //
+
+      // 🌐 Boundary reflection: steer toward center
       if (jellies[i].pos().mag() > scene2Boundary) {
-        jellies[i].faceToward(al::Vec3f(0),
-                              0.02); // turn gently back toward center
-      } else {
-        jellies[i].turnF(0.007); // slow continuous turn (steering head)
+        jellies[i].faceToward(al::Vec3f(0), 0.02f);
       }
 
-      // Move forward like a real creature
-      jellies[i].moveF(jelliesSpeedScene2);
+      // bobbing
+      float bob = 0.003f * std::sin(t * 0.5f);
+      jellies[i].pos().y += bob;
 
-      // Apply motion update
+      // standard move forward
+      jellies[i].moveF(jelliesSpeedScene2);
       jellies[i].step(dt);
     }
 
