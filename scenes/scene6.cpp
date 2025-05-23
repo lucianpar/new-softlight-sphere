@@ -37,6 +37,7 @@
 // #include "softlight-sphere/imageToMesh.hpp"
 // #include "softlight-sphere/imageToSphere.hpp"
 #include "softlight-sphere/utility/attractors.hpp"
+#include "softlight-sphere/utility/creatures.hpp"
 #include "softlight-sphere/utility/imageColorToMesh.hpp"
 
 /* TO DO:
@@ -65,20 +66,20 @@ public:
   //// SCENE 6 DECLARE START
 
   // scene 6 MESHES
-  al::VAOMesh blobMesh;
   al::VAOMesh jellyCreatureMesh;
   std::vector<al::Nav> jellies;
   std::vector<al::Vec3f> velocity;
   std::vector<al::Vec3f> force;
+  Creature creature;
 
   // SCENE 6 PARAMS
   float scene2Boundary = 30.0f;
   bool inSphereScene2 = true;
   float jellieseperationThresh = 2.0f;
-  int nAgentsScene2 = 30;
+  int nAgentsScene6 = 5;
   float jelliesSpeedScene2 = 0.1;
   float jelliesizeScene2 = 0.5;
-  float pointSize = 1.0;
+  float pointSize = 5.0;
   std::vector<al::Vec3f> colorPallete = {
       {1.0f, 0.0f, 0.5}, {0.11, 0.2, 0.46}, {0.11, 0.44, 0.46}};
 
@@ -118,14 +119,32 @@ public:
     // std::vector<al::Vec3f> colorPallete = {{0.9f, 0.0f, 0.4}, {0.4f, 0.0f,
     // 0.9}};
 
-    blobMesh.generateNormals();
+    // addSphere(jellyCreatureMesh, jelliesizeScene2, 30, 30);
+    // addSphere(jellyCreatureMesh, jelliesizeScene2 / 2.0, 15, 15);
+    // addSphere(jellyCreatureMesh, jelliesizeScene2 / 4.0, 7, 7);
+    // al::addIcosphere(jellyCreatureMesh);
+    //  addSinusoidalLegs(jellyCreatureMesh);
+    // al::addIcosphere(jellyCreatureMesh);
+    //  int numVerts = jellyCreatureMesh.vertices().size();
+    //  for (int i = jellyCreatureMesh.colors().size(); i < numVerts; ++i) {
+    //    jellyCreatureMesh.color(al::RGB(1.0, 1.0, 1.0));  // this is to deal
+    //    with vao color buffer mismatch
+    //  }
+    //  addIcosphereWithColor(jellyCreatureMesh);
+    //  addSinusoidalLegs(jellyCreatureMesh);
+    creature.makeJellyfish(jellyCreatureMesh, 3.0f, 40, 40);
 
-    addSphere(jellyCreatureMesh, jelliesizeScene2, 30, 30);
     jellyCreatureMesh.primitive(al::Mesh::POINTS);
+    // addCone(jellyCreatureMesh);
+
     // cube adds sort of particle surrounding
     // addCube(mesh, false, 2.0);
     // mesh.primitive(Mesh::POINTS);
-    jellyCreatureMesh.scale(1.0, 0.7, 0.9);
+    // jellyCreatureMesh.scale(1.0, 0.7, 0.9);
+    // addSinusoidalLegs(jellyCreatureMesh, 12, 50, 3.0f, 0.15f, 5.0f);
+
+    // jellyCreatureMesh.update();
+    jellyCreatureMesh.generateNormals();
     jellyPulse.setBaseMesh(jellyCreatureMesh.vertices());
     jellyPulse.setParams(0.3, 0.2, 1);
 
@@ -133,7 +152,7 @@ public:
 
     // blobMesh.update();
 
-    for (int b = 0; b < nAgentsScene2; ++b) {
+    for (int b = 0; b < nAgentsScene6; ++b) {
       al::Nav p;
       p.pos() = randomVec3f(5);
       p.quat()
@@ -146,7 +165,8 @@ public:
       // force.push_back(al::Vec3f(0));
     }
 
-    nav().pos(al::Vec3d(jellies[0].pos())); // Set the camera to view the scene
+    // nav().pos(al::Vec3d(jellies[0].pos())); // Set the camera to view the
+    // scene
 
     jellyEffectChain.pushBack(&jellyPulse);
   }
@@ -184,7 +204,8 @@ public:
     ///// SCENE 6  ANIMATE ->>>>>
 
     // SCENE 6 CAMERA
-    nav().pos(al::Vec3d(jellies[0].pos()));
+    // nav().pos(al::Vec3d(jellies[0].pos()));
+    // nav().spin(0.2);
     // camernav().turnF(0.6);
 
     // SCENE 6 MAIN LOGIC
@@ -218,7 +239,8 @@ public:
 
       // SCENE 6 WORLD LIGHTING
       glEnable(GL_BLEND);
-      g.blendTrans();
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+      // g.blendTrans();
       g.depthTesting(true);
       g.clear(0.1, 0.0, 0.3);
 
@@ -228,7 +250,7 @@ public:
       light.ambient(al::RGB(0.5, (1.0), 1.0));
       light.diffuse(al::RGB(1, 1, 0.5));
       g.light(light);
-      material.specular(light.diffuse() * 2.0);
+      material.specular(light.diffuse() * (1.0));
       material.shininess(300);
       g.material(material);
       // end of lighting for karl's example
@@ -245,7 +267,9 @@ public:
         g.pushMatrix();
         g.translate(jellies[i].pos());
         g.rotate(jellies[i].quat());
-        g.color(newColor.x, newColor.y, newColor.z, 0.7);
+        // g.color(newColor.x, newColor.y, newColor.z, 0.2);
+        float flicker = 0.1f + 0.05f * std::sin(globalTime * 2.0);
+        g.color(1.0f, 0.4f, 0.7f, flicker);
         g.draw(jellyCreatureMesh);
         g.popMatrix();
       }
