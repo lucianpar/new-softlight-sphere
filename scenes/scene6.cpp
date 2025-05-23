@@ -73,18 +73,20 @@ public:
   Creature creature;
 
   // SCENE 6 PARAMS
-  float scene2Boundary = 30.0f;
+  float scene2Boundary = 15.0f;
   bool inSphereScene2 = true;
   float jellieseperationThresh = 2.0f;
   int nAgentsScene6 = 5;
-  float jelliesSpeedScene2 = 0.1;
-  float jelliesizeScene2 = 0.5;
-  float pointSize = 5.0;
+  float jelliesSpeedScene2 = 2.0;
+  float jelliesizeScene2 = 2.5;
+  float pointSize = 2.5;
   std::vector<al::Vec3f> colorPallete = {
       {1.0f, 0.0f, 0.5}, {0.11, 0.2, 0.46}, {0.11, 0.44, 0.46}};
 
   // SCENE 6  MESH EFFECTS//
   AutoPulseEffect jellyPulse;
+  RippleEffect jellyRippleY;
+  RippleEffect jellyRippleX;
   VertexEffectChain jellyEffectChain;
 
   // SCENE 6 DECLARE END
@@ -107,46 +109,25 @@ public:
     // scene
     sequencer().playSequence();
 
-    // al::Vec3f randomVec3f(float scale) {
-    //   return Vec3f(rnd::uniformS(), rnd::uniformS(), rnd::uniformS()) *
-    //   scale;
-    // }
-
     // //INITIALIZE LIGHTING
 
     nav().pos(0, 0, 0);
 
-    // std::vector<al::Vec3f> colorPallete = {{0.9f, 0.0f, 0.4}, {0.4f, 0.0f,
-    // 0.9}};
+    // creature.makeJellyfish(jellyCreatureMesh);
+    creature.makeJellyfish(
+        jellyCreatureMesh, 0.6f, 72, 48, 8, 40, 40, 4.0f, 0.25f, 5.5f,
+        1.0f); // less resolution than default by turning tendrils down
 
-    // addSphere(jellyCreatureMesh, jelliesizeScene2, 30, 30);
-    // addSphere(jellyCreatureMesh, jelliesizeScene2 / 2.0, 15, 15);
-    // addSphere(jellyCreatureMesh, jelliesizeScene2 / 4.0, 7, 7);
-    // al::addIcosphere(jellyCreatureMesh);
-    //  addSinusoidalLegs(jellyCreatureMesh);
-    // al::addIcosphere(jellyCreatureMesh);
-    //  int numVerts = jellyCreatureMesh.vertices().size();
-    //  for (int i = jellyCreatureMesh.colors().size(); i < numVerts; ++i) {
-    //    jellyCreatureMesh.color(al::RGB(1.0, 1.0, 1.0));  // this is to deal
-    //    with vao color buffer mismatch
-    //  }
-    //  addIcosphereWithColor(jellyCreatureMesh);
-    //  addSinusoidalLegs(jellyCreatureMesh);
-    creature.makeJellyfish(jellyCreatureMesh, 3.0f, 40, 40);
-
+    jellyCreatureMesh.scale(jelliesizeScene2);
     jellyCreatureMesh.primitive(al::Mesh::POINTS);
-    // addCone(jellyCreatureMesh);
-
-    // cube adds sort of particle surrounding
-    // addCube(mesh, false, 2.0);
-    // mesh.primitive(Mesh::POINTS);
-    // jellyCreatureMesh.scale(1.0, 0.7, 0.9);
-    // addSinusoidalLegs(jellyCreatureMesh, 12, 50, 3.0f, 0.15f, 5.0f);
-
-    // jellyCreatureMesh.update();
     jellyCreatureMesh.generateNormals();
     jellyPulse.setBaseMesh(jellyCreatureMesh.vertices());
-    jellyPulse.setParams(0.3, 0.2, 1);
+    jellyRippleY.setParams(0.2, 0.005, 2.0, 'y');
+    // jellyRippleX.setParams(0.1, 0.08, 2.0, 'x');
+    jellyEffectChain.pushBack(&jellyRippleY);
+    // jellyEffectChain.pushBack(&jellyRippleX);
+
+    // jellyPulse.setParams(0.3, 0., 1);
 
     jellyCreatureMesh.update();
 
@@ -168,7 +149,7 @@ public:
     // nav().pos(al::Vec3d(jellies[0].pos())); // Set the camera to view the
     // scene
 
-    jellyEffectChain.pushBack(&jellyPulse);
+    // jellyEffectChain.pushBack(&jellyPulse);
   }
 
   ////BASIC TRIGGERING////
@@ -211,18 +192,19 @@ public:
     // SCENE 6 MAIN LOGIC
 
     for (int i = 0; i < jellies.size(); ++i) {
-      // inSphereScene2 = true;
-      if (jellies[i].pos().mag() >= scene2Boundary) {
-        jellies[i].faceToward(jellies[i].uf() * (-1.0), 0.1);
-        jellies[i].moveF(jelliesizeScene2);
+      // Boundary reflection: if out of bounds, slowly turn around
+      if (jellies[i].pos().mag() > scene2Boundary) {
+        jellies[i].faceToward(al::Vec3f(0),
+                              0.02); // turn gently back toward center
+      } else {
+        jellies[i].turnF(0.007); // slow continuous turn (steering head)
       }
 
-      jellies[i].moveF(1.0);
+      // Move forward like a real creature
+      jellies[i].moveF(jelliesSpeedScene2);
 
-      jellies[i].step(
-          sceneTime * jelliesSpeedScene2 /
-          (sceneTime +
-           0.1)); // scene time vs dt - unsure what works better for this
+      // Apply motion update
+      jellies[i].step(dt);
     }
 
     // SCENE 6 UPDATE AND PROCESS
@@ -246,12 +228,12 @@ public:
 
       g.lighting(true);
       // lighting from karl's example
-      light.globalAmbient(al::RGB(0.5, (1.0), 1.0));
-      light.ambient(al::RGB(0.5, (1.0), 1.0));
-      light.diffuse(al::RGB(1, 1, 0.5));
+      light.globalAmbient(al::RGB(1.0, 1.0, 1.0));
+      light.ambient(al::RGB(1.0, 1.0, 1.0));
+      light.diffuse(al::RGB(1, 1, 1.0));
       g.light(light);
-      material.specular(light.diffuse() * (1.0));
-      material.shininess(300);
+      material.specular(1.0);
+      material.shininess(128);
       g.material(material);
       // end of lighting for karl's example
 

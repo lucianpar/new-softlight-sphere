@@ -5,77 +5,99 @@
 #include "al/graphics/al_VAOMesh.hpp"
 #include "al/math/al_Complex.hpp"
 #include "al/math/al_Constants.hpp"
+#include "al/math/al_Random.hpp"
+#include "al/math/al_StdRandom.hpp"
 #include "al/math/al_Vec.hpp"
 class Creature {
 
 public:
+  // extreme llm use for this
   void makeJellyfish(al::VAOMesh &mesh, float headRadius = 0.5f,
-                     int headSlices = 30, int headStacks = 30, int numLegs = 12,
-                     int segmentsPerLeg = 50, float amplitude = 0.15f,
-                     float frequency = 5.0f,
-                     float legRatio = 6.0f // 👈 scales legs relative to head
-  ) {
-    mesh.reset(); // clear geometry
-    mesh.primitive(al::Mesh::POINTS);
+                     int radialDivs = 64, int verticalDivs = 32,
+                     int ruffleRings = 6, int numTendrils = 90,
+                     int segmentsPerTendril = 100,
+                     float legRatio = 4.0f, // ⬅️ shorter tendrils
+                     float amplitude = 0.2f, float frequency = 6.0f,
+                     float twistAmount = 0.8f) {
+    using namespace al;
+    mesh.reset();
+    mesh.primitive(Mesh::POINTS);
 
-    // Generate a temporary mesh for the sphere
-    al::Mesh head;
-    head.primitive(al::Mesh::POINTS);
-    addSphere(head, 1.0f, headSlices,
-              headStacks); // radius=1.0f, apply scale later
+    // ---- HEAD DOME (Organic) ----
+    for (int y = 0; y < verticalDivs; ++y) {
+      float v = (float)y / (verticalDivs - 1); // 0 (top) to 1 (rim)
+      float ringRadius = sin(v * M_PI * 0.5f); // dome shape
+      float yPos = cos(v * M_PI * 0.5f);       // vertical taper
 
-    // Find the topmost vertex (highest y)
-    int topIndex = 0;
-    float maxY = head.vertices()[0].y;
-    for (int i = 1; i < head.vertices().size(); ++i) {
-      if (head.vertices()[i].y > maxY) {
-        maxY = head.vertices()[i].y;
-        topIndex = i;
+      float lobeMod = 1.0f + 0.05f * sin(radialDivs * v * M_PI * 2.0f);
+
+      for (int x = 0; x < radialDivs; ++x) {
+        float u = (float)x / radialDivs;
+        float theta = u * M_2PI;
+        float r = ringRadius * headRadius * lobeMod;
+
+        float px = r * cos(theta);
+        float py = yPos * headRadius * (0.6 + 0.4 * v); // bulge taper
+        float pz = r * sin(theta);
+
+        mesh.vertex(Vec3f(px, py, pz));
+        mesh.color(RGB(1.0, 0.6, 0.7)); // glowing pink
       }
     }
 
-    // Move top vertex to index 0
-    std::vector<al::Vec3f> reorderedVerts = head.vertices();
-    std::swap(reorderedVerts[0], reorderedVerts[topIndex]);
+    // ---- RUFFLED SKIRT ----
+    for (int ring = 0; ring < ruffleRings; ++ring) {
+      float yOffset = -0.02f * ring;
+      float radius = headRadius * (0.4f + 0.1f * ring);
 
-    // Apply head scaling: radius and squish
-    for (auto &v : reorderedVerts) {
-      v.x *= headRadius;
-      v.y *= headRadius * 0.7f;
-      v.z *= headRadius * 0.9f;
+      for (int x = 0; x < radialDivs; ++x) {
+        float u = (float)x / radialDivs;
+        float theta = u * M_2PI;
+        float wobble = 0.02f * sin(8 * theta + ring * 0.5f);
+
+        float px = (radius + wobble) * cos(theta);
+        float py = yOffset;
+        float pz = (radius + wobble) * sin(theta);
+
+        mesh.vertex(Vec3f(px, py, pz));
+        mesh.color(RGB(1.0, 0.8, 0.9)); // pearlescent edge
+      }
     }
 
-    // Add to final mesh with head color
-    al::RGB headColor(0.8, 0.5, 1.0);
-    for (const auto &v : reorderedVerts) {
-      mesh.vertex(v);
-      mesh.color(headColor);
-    }
-
-    // Compute leg length from ratio
+    // ---- TENDRILS ----
     float legLength = headRadius * legRatio;
 
-    // Add sinusoidal legs
-    float angleStep = M_2PI / numLegs;
-    for (int i = 0; i < numLegs; ++i) {
-      float angle = i * angleStep;
-      float xOrigin = std::cos(angle) * headRadius * 0.5f;
-      float zOrigin = std::sin(angle) * headRadius * 0.5f;
+    for (int i = 0; i < numTendrils; ++i) {
+      float angle = al::rnd::uniform(M_2PI);
+      float radialOffset = al::rnd::uniform(0.2f, 0.5f) * headRadius;
 
-      for (int j = 0; j < segmentsPerLeg; ++j) {
-        float y = -j * (legLength / segmentsPerLeg);
-        float offsetX = std::sin(j * frequency * 0.1f) * amplitude * headRadius;
-        float offsetZ = std::cos(j * frequency * 0.1f) * amplitude * headRadius;
+      float baseX = cos(angle) * radialOffset;
+      float baseZ = sin(angle) * radialOffset;
 
-        float x = xOrigin + offsetX;
-        float z = zOrigin + offsetZ;
+      float thisAmp = amplitude * al::rnd::uniform(0.5f, 1.2f);
+      float thisFreq = frequency * al::rnd::uniform(0.5f, 1.2f);
+      float thisTwist = twistAmount * al::rnd::uniformS();
 
-        mesh.vertex(al::Vec3f(x, y, z));
-        mesh.color(al::RGB(0.2, 0.4, 0.8)); // leg color
+      for (int j = 0; j < segmentsPerTendril; ++j) {
+        float t = (float)j / segmentsPerTendril;
+        float y = -t * legLength;
+
+        float offsetX = sin(j * thisFreq * 0.1f) * thisAmp * (1.0f - t);
+        float offsetZ = cos(j * thisFreq * 0.1f) * thisAmp * (1.0f - t);
+        float spiral = thisTwist * j;
+
+        float x = baseX + offsetX + cos(spiral) * 0.01f;
+        float z = baseZ + offsetZ + sin(spiral) * 0.01f;
+
+        mesh.vertex(Vec3f(x, y, z));
+        mesh.color(RGB(0.9, 0.5 + 0.3 * t, 0.8)); // gradient tint
       }
     }
 
-    mesh.update(); // finalize VAO
+    mesh.update();
+
+    std::cout << "[Jellyfish] Organic mesh created with "
+              << mesh.vertices().size() << " vertices." << std::endl;
   }
 
   void addStarfish(al::Mesh &m, int arms = 5, float armLength = 1.0f,
