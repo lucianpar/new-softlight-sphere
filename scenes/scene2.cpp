@@ -212,6 +212,14 @@ public:
       blobs[i].moveF(1.0);
 
       blobs[i].step(sceneTime * blobsSpeedScene2 / (sceneTime + 0.1));
+
+      // SHOULD PROBABLY UPDATE LIKE SO
+      /*
+      AND ADJUST TIMES ACCORDINGLY - SCALE WAY UP
+      blobs[i].moveF(blobsSpeedScene2);
+
+      blobs[i].step(dt);
+      */
     }
 
     blobsEffectChain.process(blobMesh, sceneTime);
