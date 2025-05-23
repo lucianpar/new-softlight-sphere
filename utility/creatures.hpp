@@ -15,8 +15,7 @@ public:
   void makeJellyfish(al::VAOMesh &mesh, float headRadius = 0.5f,
                      int radialDivs = 64, int verticalDivs = 32,
                      int ruffleRings = 6, int numTendrils = 90,
-                     int segmentsPerTendril = 100,
-                     float legRatio = 4.0f, // ⬅️ shorter tendrils
+                     int segmentsPerTendril = 100, float legRatio = 4.0f,
                      float amplitude = 0.2f, float frequency = 6.0f,
                      float twistAmount = 0.8f) {
     using namespace al;
@@ -25,9 +24,9 @@ public:
 
     // ---- HEAD DOME (Organic) ----
     for (int y = 0; y < verticalDivs; ++y) {
-      float v = (float)y / (verticalDivs - 1); // 0 (top) to 1 (rim)
-      float ringRadius = sin(v * M_PI * 0.5f); // dome shape
-      float yPos = cos(v * M_PI * 0.5f);       // vertical taper
+      float v = (float)y / (verticalDivs - 1);
+      float ringRadius = sin(v * M_PI * 0.5f);
+      float yPos = cos(v * M_PI * 0.5f);
 
       float lobeMod = 1.0f + 0.05f * sin(radialDivs * v * M_PI * 2.0f);
 
@@ -37,18 +36,18 @@ public:
         float r = ringRadius * headRadius * lobeMod;
 
         float px = r * cos(theta);
-        float py = yPos * headRadius * (0.6 + 0.4 * v); // bulge taper
+        float py = yPos * headRadius * (0.6 + 0.4 * v);
         float pz = r * sin(theta);
 
         mesh.vertex(Vec3f(px, py, pz));
-        mesh.color(RGB(1.0, 0.6, 0.7)); // glowing pink
+        mesh.color(RGB(1.0, 0.6, 0.7));
       }
     }
 
-    // ---- RUFFLED SKIRT ----
+    // ---- RUFFLED SKIRT (now higher + tighter) ----
     for (int ring = 0; ring < ruffleRings; ++ring) {
-      float yOffset = -0.02f * ring;
-      float radius = headRadius * (0.4f + 0.1f * ring);
+      float yOffset = -0.005f * ring + 0.02f;             // raised by +0.02f
+      float radius = headRadius * (0.35f + 0.05f * ring); // tighter taper
 
       for (int x = 0; x < radialDivs; ++x) {
         float u = (float)x / radialDivs;
@@ -60,7 +59,7 @@ public:
         float pz = (radius + wobble) * sin(theta);
 
         mesh.vertex(Vec3f(px, py, pz));
-        mesh.color(RGB(1.0, 0.8, 0.9)); // pearlescent edge
+        mesh.color(RGB(1.0, 0.8, 0.9));
       }
     }
 
@@ -90,7 +89,7 @@ public:
         float z = baseZ + offsetZ + sin(spiral) * 0.01f;
 
         mesh.vertex(Vec3f(x, y, z));
-        mesh.color(RGB(0.9, 0.5 + 0.3 * t, 0.8)); // gradient tint
+        mesh.color(RGB(0.9, 0.5 + 0.3 * t, 0.8));
       }
     }
 

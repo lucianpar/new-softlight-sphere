@@ -212,6 +212,36 @@ public:
       vertices[i] = al::Vec3f(newX, newY, newZ);
     }
   }
+  void processBlackHoleSpiral(al::VAOMesh &mMesh, float time, float strength,
+                              float eventHorizon = 0.2f) {
+    auto &vertices = mMesh.vertices();
+    for (auto &v : vertices) {
+      float r = std::sqrt(v.x * v.x + v.z * v.z);
+      float angle = std::atan2(v.z, v.x);
+
+      float spiralAmount = std::exp(-r) * strength;
+      float radialPull = (r > eventHorizon ? -strength / (r + 0.01f) : -0.01f);
+
+      angle += spiralAmount * time;
+      r += radialPull * time;
+
+      v.x = std::cos(angle) * r;
+      v.z = std::sin(angle) * r;
+    }
+  }
+
+  void processPendulumWhirl(al::VAOMesh &mMesh, float time, float factor) {
+    auto &vertices = mMesh.vertices();
+    for (auto &v : vertices) {
+      float r = std::sqrt(v.x * v.x + v.z * v.z);
+      float theta = std::atan2(v.z, v.x);
+      float swirl = std::sin(r * 10.0f + time) * factor;
+      theta += swirl * 0.01f;
+
+      v.x = r * std::cos(theta);
+      v.z = r * std::sin(theta);
+    }
+  }
 };
 
 #endif

@@ -79,6 +79,7 @@ public:
 
   al::VAOMesh ribbon{al::Mesh::POINTS};
   al::VAOMesh reflectedRibbon{al::Mesh::TRIANGLES};
+  al::VAOMesh newAttractor;
 
   al::Mesh test;
   al::VAOMesh referenceMesh;
@@ -94,7 +95,7 @@ public:
   // Global Time
   double globalTime = 0;
   double sceneTime = 0;
-  float pointSize = 2.0f; // Particle size
+  float pointSize = 1.0f; // Particle size
 
   void onInit() override { gam::sampleRate(audioIO().framesPerSecond()); }
 
@@ -104,7 +105,9 @@ public:
     al::addSphere(test);
 
     // Initialize Mesh
-    // mainAttractor.makeNoiseCube(referenceMesh, 5.0, 5);
+    mainAttractor.makeNoiseCube(newAttractor, 5.0, 2500);
+    newAttractor.primitive(al::Mesh::LINE_LOOP);
+    newAttractor.update();
     // std::cout << referenceMesh.vertices()[0] << referenceMesh.vertices()[1]
     //           << std::endl;
     // random generated values that produced good deterministic results
@@ -145,6 +148,13 @@ public:
   void onAnimate(double dt) override {
     globalTime += dt;
     sceneTime += dt;
+
+    /// trying newer effect
+    // mainAttractor.processRossler(newAttractor, dt, 1.0);
+    // mainAttractor.processLorenz(newAttractor, dt, 1.0);
+
+    mainAttractor.processAizawa(newAttractor, dt, 1.0);
+    newAttractor.update();
 
     // Apply Attractor Effect
     mainAttractor.processRossler(referenceMesh, dt, 1.0);
@@ -245,32 +255,46 @@ public:
     g.depthTesting(true);
     // g.clear(1.0, 1.0, 0.9, 1.0);
     // g.clear(sin(sceneTime));
-    g.clear(0.9);
+    // g.clear(0.9);
+    // g.clear(sin(sceneTime / 2.0));
+    g.clear(0.0);
 
     // g.depthTesting(true);
     g.blending(true);
+    glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+      // g.blendTrans();
+      g.depthTesting(true);
+
+
+      g.lighting(true);
+      // lighting from karl's example
+      light.globalAmbient(al::RGB(1.0, 1.0, 1.0));
+      light.ambient(al::RGB(1.0, 1.0, 1.0));
+      light.diffuse(al::RGB(1, 1, 1.0));
+      g.light(light);
+      material.specular(1.0);
+      material.shininess(128);
+      g.material(material);
     // g.blendAdd(); // Additive blending for glowing effect
-    g.lighting(true);
-    // lighting from karl's example
-    light.globalAmbient(al::RGB(0.5, (1.0), 1.0));
-    light.ambient(al::RGB(0.5, (1.0), 1.0));
-    light.diffuse(al::RGB(1, 1, 0.5));
-    g.light(light);
-    material.specular(light.diffuse() * 0.1);
-    material.shininess(50);
+    // g.lighting(true);
+    // // lighting from karl's example
+    // light.globalAmbient(al::RGB(1.0, (1.0), 1.0));
+    // light.ambient(al::RGB(1.0, (1.0), 1.0));
+    // light.diffuse(al::RGB(1, 1, 1.0));
+    // g.light(light);
+    // material.specular(light.diffuse());
+    // material.shininess(50);
 
-    g.material(material);
+    // g.material(material);
 
-    // Use Custom Glow Shader
-    // glowShader.begin();
-    // glowShader.uniform("u_time", (float)globalTime);
-    // glowShader.uniform("u_resolution", al::Vec2f(width(), height()));
-
-    g.meshColor();
+    // g.meshColor();
     // g.color(0.0);
     g.pointSize(pointSize);
-    g.draw(referenceMesh);
-    g.draw(ribbon);
+    g.color(0.871, 0.467, 0.192, 0.1);
+    g.draw(newAttractor);
+    // g.draw(referenceMesh);
+    // g.draw(ribbon);
     // g.draw(reflectedRibbon);
     //   glowShader.end();
   }
